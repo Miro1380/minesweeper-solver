@@ -1,0 +1,262 @@
+:root {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --border: #d1d5db;
+  --accent: #2563eb;
+  --hidden-cell: #cbd5e1;
+  --hidden-cell-hover: #b6c3d6;
+  --revealed-cell: #e5e7eb;
+  --mine-cell: #fca5a5;
+  --hint-safe: #86efac;
+  --hint-mine: #fca5a5;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #1a1d24;
+    --text: #e5e7eb;
+    --text-muted: #9ca3af;
+    --border: #333844;
+    --accent: #60a5fa;
+    --hidden-cell: #3a4150;
+    --hidden-cell-hover: #454d5f;
+    --revealed-cell: #242832;
+    --mine-cell: #7f1d1d;
+    --hint-safe: #14532d;
+    --hint-mine: #7f1d1d;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+}
+
+.app {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.app__header {
+  text-align: center;
+}
+
+.app__title {
+  margin: 0 0 4px;
+  font-size: 28px;
+}
+
+.app__subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.difficulty-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.difficulty-picker__option {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.difficulty-picker__option--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.toolbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+}
+
+.toolbar__counter {
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  min-width: 64px;
+}
+
+.toolbar__face {
+  font-size: 22px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.toolbar__hint {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.toolbar__hint:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.hint-panel {
+  width: 100%;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.hint-panel--safe {
+  background: var(--hint-safe);
+}
+
+.hint-panel--mine {
+  background: var(--hint-mine);
+}
+
+.board {
+  display: grid;
+  gap: 2px;
+  background: var(--border);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.cell {
+  aspect-ratio: 1;
+  width: clamp(20px, 6vw, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(11px, 3vw, 15px);
+  font-weight: 700;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cell--hidden {
+  background: var(--hidden-cell);
+}
+
+.cell--hidden:hover:not(:disabled) {
+  background: var(--hidden-cell-hover);
+}
+
+.cell--revealed {
+  background: var(--revealed-cell);
+  cursor: default;
+}
+
+.cell--mine {
+  background: var(--mine-cell);
+}
+
+.cell--hint-safe {
+  outline: 3px solid #16a34a;
+  outline-offset: -3px;
+}
+
+.cell--hint-mine {
+  outline: 3px solid #dc2626;
+  outline-offset: -3px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 24px 32px;
+  text-align: center;
+  max-width: 320px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal h2 {
+  margin: 0 0 8px;
+}
+
+.modal__time {
+  margin: 4px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.modal__best {
+  margin: 4px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.modal__button {
+  margin-top: 16px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.app__footer {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.app__footer a {
+  color: inherit;
+}
