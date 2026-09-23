@@ -1,41 +1,22 @@
-import { useEffect, useState } from 'react'
-
-function readStorage<T>(key: string, initial: T): T {
-  try {
-    const raw = window.localStorage.getItem(key)
-    return raw === null ? initial : (JSON.parse(raw) as T)
-  } catch {
-    return initial
-  }
-}
+// TODO: import { useState, useEffect } from 'react' (and whatever else you need)
 
 /**
- * A generic, JSON-backed `useState` that persists to `localStorage`.
- * `<T>` is inferred from `initial`, so callers get back a correctly-typed
- * value/setter pair without ever touching `JSON.parse`/`stringify` or
- * worrying about a browser that blocks storage access (private mode, quota).
+ * TODO: A generic, JSON-backed `useState` that persists to `localStorage`.
+ * Should behave like `useState<T>`, but read its initial value from
+ * `localStorage[key]` (falling back to `initial`) and keep it in sync on
+ * every update.
  *
- * The write to `localStorage` — a real external system — lives in a
- * `useEffect` that syncs whenever `value` changes, rather than inside the
- * `useState` updater itself; a `useState` updater must stay a pure
- * function of its previous value, since React is free to invoke it more
- * than once (e.g. Strict Mode) before committing.
+ * Hints:
+ * - Make it generic: `useLocalStorageState<T>(key: string, initial: T)`.
+ * - `localStorage.getItem`/`setItem` can throw (private browsing, quota) —
+ *   don't let that crash the app.
+ * - Where should the actual `localStorage.setItem` call live? A `useState`
+ *   updater function must stay a *pure* function of its previous value —
+ *   React is allowed to call it more than once before committing (e.g. in
+ *   Strict Mode). Writing to an external system like `localStorage` inside
+ *   one is a common but subtly incorrect pattern. What's the correct hook
+ *   for "synchronize with something outside React whenever a value changes"?
  */
-export function useLocalStorageState<T>(
-  key: string,
-  initial: T,
-): [T, (value: T | ((previous: T) => T)) => void] {
-  const [value, setValue] = useState<T>(() => readStorage(key, initial))
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(key, JSON.stringify(value))
-    } catch {
-      // Storage can throw (quota, private mode) — the in-memory state still works.
-    }
-  }, [key, value])
-
-  // useState's own setter already accepts a value or an updater function
-  // and is stable across renders, so it can be returned as-is.
-  return [value, setValue]
+export function useLocalStorageState<T>(key: string, initial: T) {
+  throw new Error('TODO: implement useLocalStorageState')
 }

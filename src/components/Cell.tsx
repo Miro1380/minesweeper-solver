@@ -1,78 +1,21 @@
-import { type Cell as CellType, type Coordinate, assertNever } from '../engine/types'
-
-const NUMBER_COLORS: Readonly<Record<number, string>> = {
-  1: '#1a56db',
-  2: '#0f766e',
-  3: '#dc2626',
-  4: '#5b21b6',
-  5: '#92400e',
-  6: '#0e7490',
-  7: '#111827',
-  8: '#6b7280',
-}
-
-interface CellProps {
-  readonly cell: CellType
-  readonly coord: Coordinate
-  readonly isMine: boolean
-  readonly hintVerdict: 'safe' | 'mine' | undefined
-  readonly interactive: boolean
-  readonly onReveal: (coord: Coordinate) => void
-  readonly onToggleFlag: (coord: Coordinate) => void
-}
-
-function cellContent(
-  cell: CellType,
-  isMine: boolean,
-): { label: string; color: string | undefined } {
-  switch (cell.status) {
-    case 'hidden':
-      return { label: '', color: undefined }
-    case 'flagged':
-      return { label: '🚩', color: undefined }
-    case 'revealed':
-      if (isMine) return { label: '💣', color: undefined }
-      if (cell.adjacentMines === 0) return { label: '', color: undefined }
-      return { label: String(cell.adjacentMines), color: NUMBER_COLORS[cell.adjacentMines] }
-    default:
-      return assertNever(cell)
-  }
-}
-
-export function Cell({
-  cell,
-  coord,
-  isMine,
-  hintVerdict,
-  interactive,
-  onReveal,
-  onToggleFlag,
-}: CellProps) {
-  const { label, color } = cellContent(cell, isMine)
-  const isRevealed = cell.status === 'revealed'
-
-  const classNames = ['cell', isRevealed ? 'cell--revealed' : 'cell--hidden']
-  if (isRevealed && isMine) classNames.push('cell--mine')
-  if (hintVerdict) classNames.push(`cell--hint-${hintVerdict}`)
-
-  return (
-    <button
-      type="button"
-      className={classNames.join(' ')}
-      style={color ? { color } : undefined}
-      disabled={!interactive || (isRevealed && !isMine)}
-      aria-label={`Row ${String(coord.row + 1)}, column ${String(coord.col + 1)}${
-        cell.status === 'flagged' ? ', flagged' : ''
-      }`}
-      onClick={() => {
-        onReveal(coord)
-      }}
-      onContextMenu={(event) => {
-        event.preventDefault()
-        onToggleFlag(coord)
-      }}
-    >
-      {label}
-    </button>
-  )
+/**
+ * TODO: Render a single board cell as a button.
+ *
+ * Hints:
+ * - Props you'll likely need: the `Cell` data, its `Coordinate`, whether
+ *   it holds a mine (only meaningful once the game is over), the current
+ *   hint verdict for this cell (if any, to highlight it), whether the board
+ *   is still interactive, and reveal/flag callbacks.
+ * - Use a `switch` over the cell's `status` (with an `assertNever` default)
+ *   to decide what to render: nothing for hidden, a flag icon for flagged,
+ *   a number (or nothing, for 0) for revealed — plus a mine icon if this
+ *   revealed cell happens to hold a mine.
+ * - Classic Minesweeper colors each number differently (1=blue, 2=green,
+ *   3=red, etc.) — a small lookup object works well for this.
+ * - Left-click should reveal; right-click (`onContextMenu`, with
+ *   `event.preventDefault()`) should toggle a flag instead of opening the
+ *   browser's context menu.
+ */
+export function Cell() {
+  return null // TODO: implement
 }

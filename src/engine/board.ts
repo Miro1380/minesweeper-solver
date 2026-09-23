@@ -1,183 +1,91 @@
-import { type Board, type Cell, type Coordinate, type MineLayout, coordinate } from './types'
+// TODO: import whatever types you end up defining in ./types, e.g.:
+// import type { Board, Cell, Coordinate } from './types'
 
-export function createEmptyBoard(width: number, height: number, mineCount: number): Board {
-  const cells: Cell[][] = Array.from({ length: height }, () =>
-    Array.from({ length: width }, (): Cell => ({ status: 'hidden' })),
-  )
-  return { width, height, mineCount, cells, mines: undefined }
-}
-
-export function inBounds(board: Pick<Board, 'width' | 'height'>, c: Coordinate): boolean {
-  return c.row >= 0 && c.row < board.height && c.col >= 0 && c.col < board.width
-}
-
-export function neighborsOf(board: Pick<Board, 'width' | 'height'>, c: Coordinate): Coordinate[] {
-  const result: Coordinate[] = []
-  for (let dRow = -1; dRow <= 1; dRow++) {
-    for (let dCol = -1; dCol <= 1; dCol++) {
-      if (dRow === 0 && dCol === 0) continue
-      const candidate = coordinate(c.row + dRow, c.col + dCol)
-      if (inBounds(board, candidate)) result.push(candidate)
-    }
-  }
-  return result
-}
-
-function countAdjacentMines(mines: MineLayout, board: Board, c: Coordinate): number {
-  return neighborsOf(board, c).filter((n) => mines[n.row]?.[n.col] === true).length
+/**
+ * TODO: Build a new, empty board: a `height` x `width` grid where every
+ * cell is hidden, `mineCount` is recorded, and mines haven't been placed yet.
+ */
+export function createEmptyBoard(width: number, height: number, mineCount: number) {
+  throw new Error('TODO: implement createEmptyBoard')
 }
 
 /**
- * Mines are placed lazily, on the first reveal, and never on the revealed
- * cell or its immediate neighbors. This is the classic "first click is
- * always safe (and boring)" guarantee — without it, a new player can lose
- * on turn one purely to bad luck before they've seen any information.
+ * TODO: Return true if a coordinate falls within the board's bounds.
  */
-export function placeMines(board: Board, firstClick: Coordinate): Board {
-  const cellsExcluding = (forbidden: ReadonlySet<string>): Coordinate[] => {
-    const result: Coordinate[] = []
-    for (let row = 0; row < board.height; row++) {
-      for (let col = 0; col < board.width; col++) {
-        if (!forbidden.has(`${row.toString()},${col.toString()}`)) result.push(coordinate(row, col))
-      }
-    }
-    return result
-  }
-
-  const firstClickNeighborhood = new Set<string>([
-    `${firstClick.row.toString()},${firstClick.col.toString()}`,
-    ...neighborsOf(board, firstClick).map((n) => `${n.row.toString()},${n.col.toString()}`),
-  ])
-
-  // On a small enough board, excluding the whole first-click neighborhood
-  // can leave fewer free cells than `mineCount`. Fall back to excluding
-  // only the clicked cell itself, so the invariant "there are always
-  // exactly `mineCount` mines" never breaks — the tradeoff is that a mine
-  // can then land right next to the first click on tiny boards only.
-  const candidates =
-    cellsExcluding(firstClickNeighborhood).length >= board.mineCount
-      ? cellsExcluding(firstClickNeighborhood)
-      : cellsExcluding(new Set([`${firstClick.row.toString()},${firstClick.col.toString()}`]))
-
-  // Fisher-Yates partial shuffle: pick `mineCount` distinct candidates.
-  const shuffled = [...candidates]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const a = shuffled[i]
-    const b = shuffled[j]
-    if (a === undefined || b === undefined) continue
-    shuffled[i] = b
-    shuffled[j] = a
-  }
-
-  const mineCoords = shuffled.slice(0, board.mineCount)
-  const mines: boolean[][] = Array.from({ length: board.height }, () =>
-    Array.from({ length: board.width }, () => false),
-  )
-  for (const c of mineCoords) {
-    const mineRow = mines[c.row]
-    if (mineRow) mineRow[c.col] = true
-  }
-
-  return { ...board, mines }
-}
-
-function cloneCells(cells: Board['cells']): Cell[][] {
-  return cells.map((row) => [...row])
+export function inBounds(/* board, coordinate */) {
+  throw new Error('TODO: implement inBounds')
 }
 
 /**
- * Reveals a cell. If it has zero adjacent mines, cascades outward to reveal
- * the connected region of zero-cells and their numbered borders (a flood
- * fill), matching standard Minesweeper behavior.
+ * TODO: Return the (up to 8) neighboring coordinates of a cell, clipped to
+ * the board's edges/corners.
  */
-export function revealCell(board: Board, start: Coordinate): Board {
-  if (!board.mines) return board
-  const mines = board.mines
-  const cells = cloneCells(board.cells)
-
-  const stack: Coordinate[] = [start]
-  const visited = new Set<string>()
-
-  while (stack.length > 0) {
-    const c = stack.pop()
-    if (!c) continue
-    const key = `${c.row.toString()},${c.col.toString()}`
-    if (visited.has(key)) continue
-    visited.add(key)
-
-    const current = cells[c.row]?.[c.col]
-    if (!current || current.status === 'revealed' || current.status === 'flagged') continue
-
-    const adjacentMines = countAdjacentMines(mines, board, c)
-    const row = cells[c.row]
-    if (row) row[c.col] = { status: 'revealed', adjacentMines }
-
-    const isMine = mines[c.row]?.[c.col] === true
-    if (!isMine && adjacentMines === 0) {
-      for (const n of neighborsOf(board, c)) stack.push(n)
-    }
-  }
-
-  return { ...board, cells }
+export function neighborsOf(/* board, coordinate */) {
+  throw new Error('TODO: implement neighborsOf')
 }
 
-export function toggleFlag(board: Board, c: Coordinate): Board {
-  const current = board.cells[c.row]?.[c.col]
-  if (!current || current.status === 'revealed') return board
-
-  const cells = cloneCells(board.cells)
-  const row = cells[c.row]
-  if (!row) return board
-  row[c.col] = current.status === 'flagged' ? { status: 'hidden' } : { status: 'flagged' }
-  return { ...board, cells }
+/**
+ * TODO: Place `mineCount` mines randomly, never on `firstClick` or its
+ * neighbors — so the player's first reveal is always guaranteed safe.
+ *
+ * Hint: think about what happens on a very small board, where excluding the
+ * clicked cell AND all of its neighbors might leave fewer free cells than
+ * `mineCount` requires. What should happen then? (There's a real, testable
+ * edge case here — don't just assume it can't happen.)
+ */
+export function placeMines(/* board, firstClick */) {
+  throw new Error('TODO: implement placeMines')
 }
 
-export function isMineAt(board: Board, c: Coordinate): boolean {
-  return board.mines?.[c.row]?.[c.col] === true
+/**
+ * TODO: Reveal a cell. If it has zero adjacent mines, cascade outward and
+ * reveal the whole connected region of zero-cells plus their numbered
+ * borders (classic Minesweeper "flood fill").
+ *
+ * Hint: a cell with zero adjacent mines can, by definition, never be
+ * adjacent to a mine — so a flood fill starting from a zero-cell will never
+ * accidentally reveal a mine. Also think about immutability: this should
+ * return a *new* board rather than mutating the one passed in.
+ */
+export function revealCell(/* board, coordinate */) {
+  throw new Error('TODO: implement revealCell')
 }
 
-export function countFlaggedCells(board: Board): number {
-  let count = 0
-  for (const row of board.cells) {
-    for (const cell of row) {
-      if (cell.status === 'flagged') count++
-    }
-  }
-  return count
+/**
+ * TODO: Toggle a cell between "hidden" and "flagged". Should be a no-op on
+ * an already-revealed cell.
+ */
+export function toggleFlag(/* board, coordinate */) {
+  throw new Error('TODO: implement toggleFlag')
 }
 
-/** True once every non-mine cell has been revealed — the win condition. */
-export function isBoardCleared(board: Board): boolean {
-  if (!board.mines) return false
-  for (let row = 0; row < board.height; row++) {
-    for (let col = 0; col < board.width; col++) {
-      const cell = board.cells[row]?.[col]
-      const mined = board.mines[row]?.[col] === true
-      if (!mined && cell?.status !== 'revealed') return false
-    }
-  }
-  return true
+/**
+ * TODO: Return whether a given coordinate holds a mine.
+ */
+export function isMineAt(/* board, coordinate */) {
+  throw new Error('TODO: implement isMineAt')
 }
 
-/** Reveals every mine, used to show the full board when the game is lost. */
-export function revealAllMines(board: Board): Board {
-  if (!board.mines) return board
-  const mines = board.mines
-  const cells = cloneCells(board.cells)
-  for (let row = 0; row < board.height; row++) {
-    for (let col = 0; col < board.width; col++) {
-      if (mines[row]?.[col] === true) {
-        const cellRow = cells[row]
-        const cell = cellRow?.[col]
-        if (cellRow && cell && cell.status !== 'flagged') {
-          cellRow[col] = {
-            status: 'revealed',
-            adjacentMines: countAdjacentMines(mines, board, coordinate(row, col)),
-          }
-        }
-      }
-    }
-  }
-  return { ...board, cells }
+/**
+ * TODO: Count how many cells are currently flagged (used to show
+ * "mines remaining" as mineCount minus this).
+ */
+export function countFlaggedCells(/* board */) {
+  throw new Error('TODO: implement countFlaggedCells')
+}
+
+/**
+ * TODO: Return true once every non-mine cell has been revealed — the win
+ * condition.
+ */
+export function isBoardCleared(/* board */) {
+  throw new Error('TODO: implement isBoardCleared')
+}
+
+/**
+ * TODO: Reveal every mine on the board (used to show the full board when
+ * the game is lost). Should leave already-flagged cells alone.
+ */
+export function revealAllMines(/* board */) {
+  throw new Error('TODO: implement revealAllMines')
 }

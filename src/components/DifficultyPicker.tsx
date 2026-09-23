@@ -1,33 +1,12 @@
-import { DIFFICULTIES, type DifficultyKey } from '../engine/types'
-
-interface DifficultyPickerProps {
-  readonly value: DifficultyKey
-  readonly onChange: (key: DifficultyKey) => void
-}
-
-const KEYS = Object.keys(DIFFICULTIES) as DifficultyKey[]
-
-export function DifficultyPicker({ value, onChange }: DifficultyPickerProps) {
-  return (
-    <div className="difficulty-picker" role="radiogroup" aria-label="Difficulty">
-      {KEYS.map((key) => (
-        <button
-          key={key}
-          type="button"
-          role="radio"
-          aria-checked={key === value}
-          className={
-            key === value
-              ? 'difficulty-picker__option difficulty-picker__option--active'
-              : 'difficulty-picker__option'
-          }
-          onClick={() => {
-            onChange(key)
-          }}
-        >
-          {DIFFICULTIES[key].label}
-        </button>
-      ))}
-    </div>
-  )
+/**
+ * TODO: Render a set of buttons, one per difficulty preset, letting the
+ * player pick one (which should start a new game at that difficulty).
+ *
+ * Hint: `Object.keys(DIFFICULTIES)` gives you the keys to map over — but
+ * note `Object.keys` types its result as `string[]`, not the literal union
+ * of your difficulty keys. Look into `as DifficultyKey[]` (safe here since
+ * you control exactly what's on `DIFFICULTIES`) or a `keyof typeof` pattern.
+ */
+export function DifficultyPicker() {
+  return null // TODO: implement
 }

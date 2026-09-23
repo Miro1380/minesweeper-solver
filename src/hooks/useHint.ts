@@ -1,36 +1,17 @@
-import { useCallback, useState } from 'react'
-import { findHint } from '../engine/solver'
-import type { Board, Deduction } from '../engine/types'
+// TODO: import { findHint } from '../engine/solver' and whatever types you need
 
 /**
- * Runs the solver on demand rather than after every move — the deduction
- * search is cheap at these board sizes, but recomputing (and re-rendering
- * a hint highlight) on every single reveal would be wasted work for a
- * feature the player only wants occasionally.
+ * TODO: Run the solver on demand (not after every move — that'd be wasted
+ * work for a feature the player only wants occasionally). Should return
+ * something like `{ hint, requestHint, clearHint }`.
+ *
+ * Hints:
+ * - `requestHint()` should run `findHint(board)` and store the result.
+ * - Any move should invalidate the previous hint — it was computed for a
+ *   board that no longer exists. Same "adjust state during render by
+ *   comparing to the previous value" pattern as `useTimer`'s reset applies
+ *   here too, comparing against the previous `board` reference.
  */
-export function useHint(board: Board): {
-  hint: Deduction | undefined
-  requestHint: () => void
-  clearHint: () => void
-} {
-  const [hint, setHint] = useState<Deduction | undefined>(undefined)
-  const [prevBoard, setPrevBoard] = useState(board)
-
-  // Any move invalidates the previous hint (it was computed for a board that
-  // no longer exists). Adjusted during render, not in an effect, following
-  // React's "reset state when a prop changes" pattern.
-  if (board !== prevBoard) {
-    setPrevBoard(board)
-    setHint(undefined)
-  }
-
-  const requestHint = useCallback(() => {
-    setHint(findHint(board))
-  }, [board])
-
-  const clearHint = useCallback(() => {
-    setHint(undefined)
-  }, [])
-
-  return { hint, requestHint, clearHint }
+export function useHint(/* board */) {
+  throw new Error('TODO: implement useHint')
 }

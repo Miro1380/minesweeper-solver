@@ -1,38 +1,27 @@
-import { useCallback, useMemo, useReducer, useState } from 'react'
-import { countFlaggedCells } from '../engine/board'
-import { createInitialState, gameReducer } from '../engine/gameReducer'
-import { DIFFICULTIES, type Coordinate, type DifficultyKey } from '../engine/types'
-import { useTimer } from './useTimer'
+// TODO: import { useReducer, useState, useCallback, useMemo } from 'react'
+// and whatever you need from ../engine/*
 
-export function useMinesweeper(initialDifficulty: DifficultyKey = 'beginner') {
-  const [state, dispatch] = useReducer(
-    gameReducer,
-    DIFFICULTIES[initialDifficulty],
-    createInitialState,
-  )
-
-  // Bumped on every "New Game" so useTimer knows to restart the clock —
-  // the reducer's own state doesn't carry a stable "this is a fresh game"
-  // signal that would survive being equal across two different empty boards.
-  const [gameNumber, setGameNumber] = useState(0)
-
-  const newGame = useCallback((difficulty: DifficultyKey) => {
-    setGameNumber((n) => n + 1)
-    dispatch({ type: 'new_game', difficulty: DIFFICULTIES[difficulty] })
-  }, [])
-
-  const reveal = useCallback((coord: Coordinate) => {
-    dispatch({ type: 'reveal_cell', coord })
-  }, [])
-
-  const toggleFlag = useCallback((coord: Coordinate) => {
-    dispatch({ type: 'toggle_flag', coord })
-  }, [])
-
-  const elapsedMs = useTimer(state.status === 'in_progress', gameNumber)
-
-  const flagsUsed = useMemo(() => countFlaggedCells(state.board), [state.board])
-  const minesRemaining = state.difficulty.mineCount - flagsUsed
-
-  return { state, newGame, reveal, toggleFlag, elapsedMs, minesRemaining }
+/**
+ * TODO: Wrap `gameReducer` in a hook that a component can actually use.
+ * Should return something like:
+ *   { state, newGame, reveal, toggleFlag, elapsedMs, minesRemaining }
+ *
+ * Hints:
+ * - `useReducer(gameReducer, someDifficulty, createInitialState)` — the
+ *   third argument is React's "lazy init" form, handy since your init
+ *   function takes an argument.
+ * - `newGame`, `reveal`, `toggleFlag` are just thin `dispatch` wrappers.
+ *   Wrap them in `useCallback` so components that receive them as props
+ *   don't re-render unnecessarily.
+ * - The reducer's own state doesn't carry a stable "this is a fresh game"
+ *   signal — two different empty boards for the same difficulty won't
+ *   necessarily be `!==` in a way you can rely on for resetting a timer.
+ *   Consider keeping your own small counter, bumped on every `newGame`
+ *   call, to hand to `useTimer` as its `resetKey`.
+ * - `minesRemaining` and "how many cells are flagged" are derived values —
+ *   compute them from `state.board`, memoized with `useMemo`, rather than
+ *   storing them as separate state that could drift out of sync.
+ */
+export function useMinesweeper(initialDifficulty?: string) {
+  throw new Error('TODO: implement useMinesweeper')
 }

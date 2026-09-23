@@ -1,43 +1,15 @@
-import { Cell } from './Cell'
-import type { Board as BoardType, Coordinate, Deduction } from '../engine/types'
-import { coordinate, coordinateKey } from '../engine/types'
-
-interface BoardProps {
-  readonly board: BoardType
-  readonly interactive: boolean
-  readonly hint: Deduction | undefined
-  readonly onReveal: (coord: Coordinate) => void
-  readonly onToggleFlag: (coord: Coordinate) => void
-}
-
-export function Board({ board, interactive, hint, onReveal, onToggleFlag }: BoardProps) {
-  const hintKey = hint ? coordinateKey(hint.coord) : undefined
-
-  return (
-    <div
-      className="board"
-      style={{ gridTemplateColumns: `repeat(${String(board.width)}, 1fr)` }}
-      role="grid"
-      aria-label="Minesweeper board"
-    >
-      {board.cells.map((row, rowIndex) =>
-        row.map((cell, colIndex) => {
-          const coord = coordinate(rowIndex, colIndex)
-          const key = coordinateKey(coord)
-          return (
-            <Cell
-              key={key}
-              cell={cell}
-              coord={coord}
-              isMine={board.mines?.[rowIndex]?.[colIndex] === true}
-              hintVerdict={hintKey === key ? hint?.verdict : undefined}
-              interactive={interactive}
-              onReveal={onReveal}
-              onToggleFlag={onToggleFlag}
-            />
-          )
-        }),
-      )}
-    </div>
-  )
+/**
+ * TODO: Render the Minesweeper board as a grid of `Cell`s.
+ *
+ * Hints:
+ * - Props you'll likely need: the `Board` data, whether it's `interactive`,
+ *   the current solver `hint` (to pass down to the one matching `Cell`),
+ *   and reveal/flag callbacks to pass through to each `Cell`.
+ * - A CSS grid with `gridTemplateColumns: repeat(board.width, 1fr)` is a
+ *   simple way to lay this out.
+ * - Give each `Cell` a stable `key` derived from its coordinate (not its
+ *   array index — think about why that matters once cells' contents change).
+ */
+export function Board() {
+  return null // TODO: implement
 }
