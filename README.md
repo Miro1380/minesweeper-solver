@@ -3,9 +3,8 @@
 A from-scratch Minesweeper built in React + TypeScript, with a real constraint-solving
 hint engine underneath — not just a click-and-reveal clone.
 
-**[Live demo](https://YOUR_GITHUB_USERNAME.github.io/minesweeper-solver/)** — replace
-`YOUR_GITHUB_USERNAME` after you push this to GitHub and enable Pages (see
-[Deployment](#deployment) below).
+**[Live demo](https://Miro1380.github.io/minesweeper-solver/)** (live once the first
+deploy finishes — see [Deployment](#deployment) below).
 
 ## Why this exists
 
