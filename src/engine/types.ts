@@ -1,61 +1,91 @@
 /**
  * Core domain types for the Minesweeper engine.
  *
- * This module should have ZERO React/DOM dependencies. Everything here is
- * meant to be plain data and pure functions, which is what will let
- * `board.ts` and `solver.ts` be unit-tested without rendering anything.
- *
- * Work through the TODOs below roughly top to bottom — later ones build on
- * earlier ones. Nothing else in the project will compile until these exist,
- * which is expected: this file is the foundation everything imports from.
+ * Zero React/DOM dependencies — plain data and pure functions, so
+ * `board.ts` and `solver.ts` can be unit-tested without rendering anything.
  */
 
-// TODO: Define a `Coordinate` type for a { row, col } pair.
-//
-// Hint: consider "branding" it — add an extra readonly field like
-// `__brand: 'Coordinate'` that no plain `{ row, col }` object would have.
-// That way a coordinate that's been validated against the board can't be
-// silently confused with a random `{row, col}` built somewhere else (e.g.
-// straight from a mouse event). Write a `coordinate(row, col)` factory
-// function to construct one, and a `coordinateKey(c)` helper that returns a
-// string key for it (useful as a Map/Set key later in the solver).
+/** A validated { row, col } board position. Branded so a plain `{row, col}`
+ * literal built elsewhere can't be mistaken for one — always construct via
+ * `coordinate()`. */
+export type Coordinate = {
+  row: number
+  col: number
+  __brand: 'Coordinate'
+}
 
-// TODO: Define a `Cell` type describing one board cell's state.
-//
-// Hint: model it as a discriminated union on a `status` field, e.g.
-// "hidden" | "flagged" | "revealed" — and only the "revealed" variant
-// carries an `adjacentMines: number`. Avoid a single object with a bunch of
-// optional/boolean fields (`isRevealed`, `isFlagged`, `mineCount?`); a
-// discriminated union makes nonsensical states (flagged AND revealed)
-// impossible to even construct, which a switch statement can then narrow on.
+/** The only way to construct a `Coordinate`. */
+export function coordinate(row: number, col: number): Coordinate {
+  return { row, col, __brand: 'Coordinate' }
+}
 
-// TODO: Define a `Board` type: `width`, `height`, `mineCount`, a 2D grid of
-// `Cell`s, and a `mines` grid.
-//
-// Hint: mines should be placeable lazily — `mines` starts `undefined` and
-// only gets set on the player's first reveal, so that first click can never
-// be a mine. Think about what type represents "a grid of booleans."
+/** String form of a `Coordinate`, for use as a Map/Set key. */
+export function coordinateKey(c: Coordinate): string {
+  return `${c.row},${c.col}`
+}
 
-// TODO: Define a `GameStatus` union: "not_started" | "in_progress" | "won" | "lost".
+/** One board cell's state. A revealed cell alone carries `adjacentMines`. */
+export type Cell =
+  | { status: 'hidden' }
+  | { status: 'flagged' }
+  | {
+      status: 'revealed'
+      adjacentMines: number
+    }
 
-// TODO: Define a `Difficulty` type (label, width, height, mineCount) and a
-// `DIFFICULTIES` constant with at least "beginner", "intermediate", and
-// "expert" presets.
-//
-// Hint: `as const satisfies Record<string, Difficulty>` gives you literal
-// types for the keys (useful for a `DifficultyKey = keyof typeof DIFFICULTIES`)
-// while still checking each entry matches the `Difficulty` shape.
+/** The full game board: its dimensions, cell grid, and mine layout.
+ * `mines` is `undefined` until the first reveal places them. */
+export type Board = {
+  width: number
+  height: number
+  mineCount: number
+  cells: Cell[][]
+  mines: boolean[][] | undefined
+}
 
-// TODO: Define a `Deduction` type for the solver's output: a `Coordinate`,
-// a `verdict` ("safe" | "mine"), and a human-readable `reason` string.
+/** The game's overall lifecycle state. */
+export type GameStatus = 'not_started' | 'in_progress' | 'won' | 'lost'
 
-// TODO: Write an `assertNever(x: never): never` helper for exhaustiveness
-// checks.
-//
-// Hint: call it in the `default` case of a `switch` over a union type. As
-// long as every other case is handled, `x` is typed `never` there — if you
-// later add a new variant to the union and forget to handle it in some
-// switch, that switch's `default` branch stops compiling instead of failing
-// silently at runtime. This is one of the more distinctive habits of a
-// TypeScript codebase versus a plain JS one — use it in `solver.ts` and
-// `gameReducer.ts`.
+/** A named board size/mine-count preset. */
+export type Difficulty = {
+  label: string
+  width: number
+  height: number
+  mineCount: number
+}
+
+/** The selectable difficulty presets. */
+export const DIFFICULTIES = {
+  beginner: {
+    label: 'Beginner',
+    width: 9,
+    height: 9,
+    mineCount: 10,
+  },
+  intermediate: {
+    label: 'Intermediate',
+    width: 12,
+    height: 12,
+    mineCount: 15,
+  },
+  expert: {
+    label: 'Expert',
+    width: 15,
+    height: 15,
+    mineCount: 20,
+  },
+} satisfies Record<string, Difficulty>
+
+/** The solver's conclusion about one cell: safe or a mine, and why. */
+export type Deduction = {
+  coordinate: Coordinate
+  verdict: 'safe' | 'mine'
+  reason: string
+}
+
+/** Exhaustiveness check: call this in a `switch`'s `default` case. If a
+ * union gains a new variant that isn't handled elsewhere in the switch,
+ * the call site stops compiling instead of failing silently at runtime. */
+export function assertNever(x: never): never {
+  throw new Error(`Unhandled case: ${JSON.stringify(x)}`)
+}
