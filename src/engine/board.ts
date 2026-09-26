@@ -1,12 +1,26 @@
 // TODO: import whatever types you end up defining in ./types, e.g.:
 // import type { Board, Cell, Coordinate } from './types'
 
+import type{Coordinate, Cell, Board, GameStatus } from './types';
+import {DIFFICULTIES} from './types';
+
 /**
  * TODO: Build a new, empty board: a `height` x `width` grid where every
  * cell is hidden, `mineCount` is recorded, and mines haven't been placed yet.
  */
 export function createEmptyBoard(width: number, height: number, mineCount: number) {
-  throw new Error('TODO: implement createEmptyBoard')
+
+  const cellArr: Cell[][] = Array.from({ length: height}, () => Array.from({length:width}, () => ({status:'hidden'}) ));
+  
+  const board:Board = {
+    width:width,
+    height:height,
+    mineCount:mineCount,
+    cells: cellArr,
+    mines: undefined
+
+  } 
+  return board
 }
 
 /**
