@@ -2,13 +2,13 @@
 // import type { Board, Cell, Coordinate } from './types'
 
 import type{Coordinate, Cell, Board, GameStatus } from './types';
-import {DIFFICULTIES} from './types';
+import {DIFFICULTIES, coordinate, coordinateKey, assertNever} from './types';
 
 /**
  * TODO: Build a new, empty board: a `height` x `width` grid where every
  * cell is hidden, `mineCount` is recorded, and mines haven't been placed yet.
  */
-export function createEmptyBoard(width: number, height: number, mineCount: number) {
+export function createEmptyBoard(width: number, height: number, mineCount: number):Board {
 
   const cellArr: Cell[][] = Array.from({ length: height}, () => Array.from({length:width}, () => ({status:'hidden'}) ));
   
@@ -26,16 +26,38 @@ export function createEmptyBoard(width: number, height: number, mineCount: numbe
 /**
  * TODO: Return true if a coordinate falls within the board's bounds.
  */
-export function inBounds(/* board, coordinate */) {
-  throw new Error('TODO: implement inBounds')
+export function inBounds(board: Board, position: Coordinate):boolean {
+
+  const colInRange = position.col < board.width && position.col >= 0;
+  const rowInRange = position.row < board.height && position.row >= 0;
+
+  return colInRange && rowInRange;
 }
 
 /**
  * TODO: Return the (up to 8) neighboring coordinates of a cell, clipped to
  * the board's edges/corners.
  */
-export function neighborsOf(/* board, coordinate */) {
-  throw new Error('TODO: implement neighborsOf')
+export function neighborsOf(board:Board, position: Coordinate):Coordinate[] {
+  const neighbors: Coordinate[] = [];
+
+
+  for(let dRow = -1 ; dRow <= 1 ; dRow++ ){
+    for(let dCol = -1 ; dCol <= 1; dCol++){
+
+      //Skip self?
+      if(dCol === 0 && dRow === 0){
+        continue;
+      }
+      
+      const coord = coordinate(position.row + dRow, position.col + dCol);
+
+      if(inBounds(board, coord)){
+        neighbors.push(coord);
+      }
+    }
+  }
+    return neighbors;
 }
 
 /**
